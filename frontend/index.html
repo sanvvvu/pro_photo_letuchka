@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forensics AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+<h1>🟢 Image Forensics System</h1>
+
+<div id="drop">Перетащи изображение сюда</div>
+
+<input type="file" id="file">
+
+<button onclick="upload()">Upload</button>
+
+<div id="preview"></div>
+
+<h2>Фотошоп</h2>
+<button onclick="process('blur')">Blur</button>
+<button onclick="process('sharpen')">Sharpen</button>
+
+<h2>EXIF</h2>
+<input id="model" placeholder="Camera Model">
+<button onclick="editExif()">Изменить EXIF</button>
+<button onclick="getExif()">Показать EXIF</button>
+
+<h2>Стеганография</h2>
+<input id="secret" placeholder="Secret text">
+<button onclick="embed()">Скрыть</button>
+<button onclick="extract()">Извлечь</button>
+
+<h2>Сравнение</h2>
+<input id="file2">
+<button onclick="compare()">Сравнить</button>
+
+<h2>Анализ</h2>
+<button onclick="analyze()">Analyze</button>
+
+<pre id="out"></pre>
+<img id="heatmap">
+
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
