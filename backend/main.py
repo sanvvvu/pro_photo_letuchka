@@ -8,11 +8,8 @@ from services.image_processing import load_image, gaussian_blur, sharpen
 from services.exif import get_exif_data, update_exif
 from services.steganography import embed_file, extract_file
 from services.compare import compare_images
-from services.forensics import analyze_forensics
 from services.ml_model import predict_image
-from services.dct_analysis import analyze_dct
 from services.heatmap import generate_heatmap_image
-from services.plot import histogram_plot
 
 app = FastAPI()
 
@@ -40,8 +37,6 @@ async def upload(file: UploadFile = File(...)):
 @app.get("/image/{name}")
 def get_image(name: str):
     path = UPLOAD_DIR / name
-    if not path.exists():
-        return {"error": "not found"}
     return FileResponse(path)
 
 
@@ -55,10 +50,11 @@ def process(filename: str = Form(...), action: str = Form(...)):
     elif action == "sharpen":
         img = sharpen(img)
 
-    out = UPLOAD_DIR / f"edit_{filename}"
-    img.save(out)
+    out_name = f"edit_{filename}"
+    out_path = UPLOAD_DIR / out_name
+    img.save(out_path)
 
-    return {"file": f"edit_{filename}"}
+    return {"file": out_name}
 
 
 # ---------- EXIF ----------
@@ -69,9 +65,12 @@ def exif(filename: str):
 
 @app.post("/exif/edit")
 def exif_edit(filename: str = Form(...), tag: str = Form(...), value: str = Form(...)):
-    out = UPLOAD_DIR / f"exif_{filename}"
-    update_exif(UPLOAD_DIR / filename, {"0th": {tag: value}}, out)
-    return {"file": f"exif_{filename}"}
+    out_name = f"exif_{filename}"
+    out_path = UPLOAD_DIR / out_name
+
+    update_exif(str(UPLOAD_DIR / filename), tag, value, str(out_path))
+
+    return {"file": out_name}
 
 
 # ---------- STEGO ----------
@@ -79,15 +78,15 @@ def exif_edit(filename: str = Form(...), tag: str = Form(...), value: str = Form
 async def embed(file: UploadFile = File(...), filename: str = Form(...)):
     data = await file.read()
 
-    out = UPLOAD_DIR / f"stego_{filename}"
-    embed_file(UPLOAD_DIR / filename, out, data)
+    out_name = f"stego_{filename}"
+    embed_file(str(UPLOAD_DIR / filename), str(UPLOAD_DIR / out_name), data)
 
-    return {"file": f"stego_{filename}"}
+    return {"file": out_name}
 
 
 @app.post("/stego/extract")
 def extract(filename: str = Form(...)):
-    text = extract_file(UPLOAD_DIR / filename).decode(errors="ignore")
+    text = extract_file(str(UPLOAD_DIR / filename))
     return {"text": text}
 
 
@@ -116,19 +115,6 @@ def analyze(filename: str = Form(...)):
     return {
         "result": "Изменено" if ml["edited"] else "Оригинал",
         "confidence": ml["confidence"],
-        "explanation": "Анализ пикселей + шум + ML классификация",
+        "explanation": "ML + шум + частотный анализ изображения",
         "heatmap": f"/image/{heat}"
     }
-
-
-# ---------- SAVE ----------
-@app.post("/save")
-def save(filename: str = Form(...), format: str = Form(...)):
-    img = load_image(UPLOAD_DIR / filename)
-
-    out = f"saved_{filename.split('.')[0]}.{format.lower()}"
-    path = UPLOAD_DIR / out
-
-    img.save(path, format=format)
-
-    return {"file": out}
