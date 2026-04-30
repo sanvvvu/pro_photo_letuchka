@@ -1,32 +1,30 @@
 body {
-    background: #a8e063;
-    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(#a8e063, #56ab2f);
+    font-family: Arial;
     text-align: center;
 }
 
 .container {
     width: 800px;
     margin: auto;
-    background: #fff;
-    border: 4px solid #000;
+    background: white;
     padding: 20px;
+    border-radius: 10px;
 }
 
 button {
     background: #ffcc00;
-    border: 3px solid #000;
+    border: none;
     padding: 10px;
+    margin: 5px;
     cursor: pointer;
-    box-shadow: 4px 4px #000;
 }
 
-button:active {
-    box-shadow: 1px 1px #000;
-    transform: translate(3px,3px);
+button:hover {
+    background: #ffaa00;
 }
 
 img {
     max-width: 100%;
-    display: block;
-    margin: auto;
+    margin-top: 10px;
 }

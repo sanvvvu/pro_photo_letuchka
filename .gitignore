@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 uploads/
+backend/__pycache__/
+backend/services/__pycache__/

@@ -1,24 +1,29 @@
 let current = "";
 
-async function upload() {
+async function upload(){
     let file = document.getElementById("file").files[0];
     let fd = new FormData();
     fd.append("file", file);
 
-    let res = await fetch("/upload", {method:"POST", body:fd});
+    let res = await fetch("/upload",{method:"POST",body:fd});
     let data = await res.json();
 
     current = data.filename;
-
     document.getElementById("preview").innerHTML =
         `<img src="/image/${current}">`;
 }
 
 async function process(action){
-    let res = await fetch(`/process?filename=${current}&action=${action}`,{method:"POST"});
-    let blob = await res.blob();
+    let fd = new FormData();
+    fd.append("filename", current);
+    fd.append("action", action);
+
+    let res = await fetch("/process",{method:"POST",body:fd});
+    let data = await res.json();
+
+    current = data.file;
     document.getElementById("preview").innerHTML =
-        `<img src="${URL.createObjectURL(blob)}">`;
+        `<img src="/image/${current}">`;
 }
 
 async function getExif(){
@@ -28,74 +33,69 @@ async function getExif(){
 }
 
 async function editExif(){
-    let model = document.getElementById("model").value;
+    let fd = new FormData();
+    fd.append("filename", current);
+    fd.append("tag", document.getElementById("tag").value);
+    fd.append("value", document.getElementById("value").value);
 
-    await fetch("/exif/edit",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({filename:current, model:model})
-    });
+    let res = await fetch("/exif/edit",{method:"POST",body:fd});
+    let data = await res.json();
 
-    alert("EXIF updated");
+    current = data.file;
+    alert("EXIF обновлён");
 }
 
 async function embed(){
-    let text = document.getElementById("secret").value;
+    let file = document.getElementById("secret").files[0];
 
-    await fetch("/stego/embed",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({filename:current,text:text})
-    });
+    let fd = new FormData();
+    fd.append("file", file);
+    fd.append("filename", current);
 
-    alert("Hidden");
+    let res = await fetch("/stego/embed",{method:"POST",body:fd});
+    let data = await res.json();
+
+    current = data.file;
+    alert("Файл скрыт");
 }
 
 async function extract(){
-    let res = await fetch("/stego/extract",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({filename:current})
-    });
+    let fd = new FormData();
+    fd.append("filename", current);
 
+    let res = await fetch("/stego/extract",{method:"POST",body:fd});
     let data = await res.json();
-    alert(data.text);
+
+    alert("Извлечено: " + data.text);
+}
+
+async function compare(){
+    let f1 = document.getElementById("file").files[0];
+    let f2 = document.getElementById("file2").files[0];
+
+    let fd = new FormData();
+    fd.append("file1", f1);
+    fd.append("file2", f2);
+
+    let res = await fetch("/compare",{method:"POST",body:fd});
+    let data = await res.json();
+
+    alert("Разница: " + data.difference_score);
+}
+
+async function analyze(){
+    let fd = new FormData();
+    fd.append("filename", current);
+
+    let res = await fetch("/analyze",{method:"POST",body:fd});
+    let data = await res.json();
+
+    document.getElementById("out").innerText =
+        data.result + "\n" + data.explanation;
+
+    document.getElementById("heatmap").src = data.heatmap;
 }
 
 function reset(){
     location.reload();
-}
-
-async function save(){
-    let format = document.getElementById("format").value;
-    alert("Сохраняется в формате "+format);
-}
-
-async function analyze(){
-    let res = await fetch(`/analyze?filename=${current}`,{method:"POST"});
-    let data = await res.json();
-
-    let text = `
-РЕЗУЛЬТАТ: ${data.result}
-
-📊 Объяснение:
-- ML модель анализирует статистику пикселей
-- Проверяется шум, структура JPEG и DCT
-- Если показатели отклоняются — фото изменено
-
-🐱 Это нужно для:
-- выявления подделок
-- защиты данных
-`;
-
-    document.getElementById("out").innerText = text;
-}
-
-async function compare(){
-    let file2 = document.getElementById("file2").value;
-
-    let res = await fetch(`/compare?file1=${current}&file2=${file2}`,{method:"POST"});
-    let data = await res.json();
-
-    alert("Difference: "+data.difference_score);
 }
