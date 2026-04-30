@@ -62,14 +62,33 @@ async function extract(){
     alert(data.text);
 }
 
+function reset(){
+    location.reload();
+}
+
+async function save(){
+    let format = document.getElementById("format").value;
+    alert("Сохраняется в формате "+format);
+}
+
 async function analyze(){
     let res = await fetch(`/analyze?filename=${current}`,{method:"POST"});
     let data = await res.json();
 
-    document.getElementById("out").innerText =
-        "RESULT: "+data.result+"\n"+JSON.stringify(data,null,2);
+    let text = `
+РЕЗУЛЬТАТ: ${data.result}
 
-    document.getElementById("heatmap").src = data.heatmap;
+📊 Объяснение:
+- ML модель анализирует статистику пикселей
+- Проверяется шум, структура JPEG и DCT
+- Если показатели отклоняются — фото изменено
+
+🐱 Это нужно для:
+- выявления подделок
+- защиты данных
+`;
+
+    document.getElementById("out").innerText = text;
 }
 
 async function compare(){
