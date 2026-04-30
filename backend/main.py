@@ -41,15 +41,14 @@ def get_image(name: str):
 
 @app.post("/process")
 def process(filename: str, action: str):
-    path = str(UPLOAD_DIR / filename)
-    img = to_grayscale(path)
+    img = load_image(str(UPLOAD_DIR/filename))
 
     if action == "blur":
         img = gaussian_blur(img)
     elif action == "sharpen":
         img = sharpen(img)
 
-    out = UPLOAD_DIR / f"proc_{filename}"
+    out = UPLOAD_DIR / f"edit_{filename}"
     img.save(out)
     return FileResponse(out)
 
