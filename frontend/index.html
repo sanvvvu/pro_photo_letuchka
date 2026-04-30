@@ -2,41 +2,55 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Форензика изображений</title>
+<title>Mario Forensics Lab</title>
+
 <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
 <div class="container">
-<h1>🍄 Форензика изображений</h1>
+
+<h1>🍄 Mario Image Forensics</h1>
+
+<div class="dropzone">📦 Drag & Drop</div>
 
 <input type="file" id="file">
-<button onclick="upload()">Загрузить</button>
+<button class="mario-btn" onclick="upload()">ЗАГРУЗИТЬ</button>
 
 <div id="preview"></div>
 
-<h2>Редактирование</h2>
-<button onclick="process('blur')">Размытие</button>
-<button onclick="process('sharpen')">Резкость</button>
-<button onclick="reset()">Сброс</button>
+<h2>🎮 РЕДАКТОР</h2>
+<button id="blurBtn" class="mario-btn" onclick="process('blur')">BLUR</button>
+<button id="sharpBtn" class="mario-btn" onclick="process('sharpen')">SHARP</button>
+<button class="mario-btn" onclick="reset()">RESET</button>
 
-<h2>EXIF</h2>
-<button onclick="getExif()">Показать</button>
-<input id="tag" placeholder="Tag">
-<input id="value" placeholder="Value">
-<button onclick="editExif()">Изменить</button>
+<h2>📊 EXIF EDITOR</h2>
 
-<h2>Стеганография</h2>
-<input type="file" id="secret">
-<button onclick="embed()">Скрыть файл</button>
-<button onclick="extract()">Извлечь</button>
+<button onclick="loadExif()">ПОКАЗАТЬ EXIF</button>
 
-<h2>Сравнение</h2>
+<table id="exifTable"></table>
+
+<input id="tag" placeholder="TAG">
+<input id="value" placeholder="VALUE">
+<button onclick="editExif()">ИЗМЕНИТЬ</button>
+
+<h2>👁 STEGO</h2>
+
+<input type="file" id="secretFile">
+<button onclick="embed()">СКРЫТЬ</button>
+<button onclick="extract()">ИЗВЛЕЧЬ</button>
+
+<div id="stegoPreview"></div>
+
+<h2>⚖ СРАВНЕНИЕ</h2>
+
 <input type="file" id="file2">
-<button onclick="compare()">Сравнить</button>
+<button onclick="compare()">COMPARE</button>
 
-<h2>Анализ</h2>
-<button onclick="analyze()">Анализ</button>
+<h2>🧠 АНАЛИЗ</h2>
+
+<button onclick="analyze()">RUN</button>
 
 <pre id="out"></pre>
 <img id="heatmap">
