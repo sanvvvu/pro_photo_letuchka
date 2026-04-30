@@ -1,3 +1,4 @@
+# backend/services/steganography.py
 from PIL import Image
 
 def embed_file(input_path, output_path, file_bytes):

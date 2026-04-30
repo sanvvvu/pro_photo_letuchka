@@ -1,3 +1,4 @@
+# backend/services/image_processing.py
 from PIL import Image, ImageFilter
 
 def load_image(path):

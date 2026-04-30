@@ -1,3 +1,4 @@
+# backend/services/exif.py
 from PIL import Image
 import piexif
 

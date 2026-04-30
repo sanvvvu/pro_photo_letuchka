@@ -1,3 +1,4 @@
+# backend/services/compare.py
 import cv2
 import numpy as np
 
