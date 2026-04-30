@@ -103,3 +103,17 @@ function reset(){
 function download(){
     window.open(`/download/${current}`);
 }
+
+async function save(){
+    let format = document.getElementById("format").value;
+
+    let fd = new FormData();
+    fd.append("filename", current);
+    fd.append("format", format);
+
+    let res = await fetch("/save",{method:"POST",body:fd});
+    let data = await res.json();
+
+    current = data.file;
+    alert("Сохранено");
+}

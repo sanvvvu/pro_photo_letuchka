@@ -130,3 +130,15 @@ def plot(filename: str = Form(...)):
 @app.get("/download/{filename}")
 def download(filename: str):
     return FileResponse(UPLOAD_DIR / filename, filename=filename)
+
+# --------- SAVE AS ----------
+@app.post("/save")
+def save(filename: str = Form(...), format: str = Form(...)):
+    img = load_image(UPLOAD_DIR / filename)
+
+    out = f"saved_{filename.split('.')[0]}.{format.lower()}"
+    path = UPLOAD_DIR / out
+
+    img.save(path, format=format)
+
+    return {"file": out}
