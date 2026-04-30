@@ -1,7 +1,7 @@
 let current = "";
 
 async function upload(){
-    let file = document.getElementById("file").files[0];
+    let file = fileInput.files[0];
     let fd = new FormData();
     fd.append("file", file);
 
@@ -9,8 +9,7 @@ async function upload(){
     let data = await res.json();
 
     current = data.filename;
-    document.getElementById("preview").innerHTML =
-        `<img src="/image/${current}">`;
+    preview.innerHTML = `<img src="/image/${current}">`;
 }
 
 async function process(action){
