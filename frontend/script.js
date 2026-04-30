@@ -79,7 +79,10 @@ async function compare(){
     let res = await fetch("/compare",{method:"POST",body:fd});
     let data = await res.json();
 
-    alert("Разница: " + data.difference_score);
+    alert(
+        "Разница: " + data.difference_score + "\n\n" +
+        data.interpretation
+    );
 }
 
 async function analyze(){
@@ -90,9 +93,13 @@ async function analyze(){
     let data = await res.json();
 
     document.getElementById("out").innerText =
-        data.result + "\n" + data.explanation;
+        `РЕЗУЛЬТАТ: ${data.result}\n` +
+        `УВЕРЕННОСТЬ: ${data.confidence}\n\n` +
+        data.explanation;
 
-    document.getElementById("heatmap").src = data.heatmap;
+    if(data.heatmap){
+        document.getElementById("heatmap").src = data.heatmap;
+    }
 }
 
 function reset(){
