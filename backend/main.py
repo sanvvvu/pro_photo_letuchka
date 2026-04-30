@@ -112,14 +112,28 @@ async def compare(file1: UploadFile = File(...), file2: UploadFile = File(...)):
 def analyze(filename: str = Form(...)):
     path = UPLOAD_DIR / filename
 
-    heat = generate_heatmap_image(path)
-    ml = predict_image(path)
+    try:
+        heat = generate_heatmap_image(path)
+        ml = predict_image(path)
 
-    return {
-        "result": "Изображение изменено" if ml["edited"] else "Изображение оригинальное",
-        "explanation": "Анализ выполнен по статистике пикселей, шуму и структуре JPEG",
-        "heatmap": f"/image/{heat}"
-    }
+        return {
+            "result": "Изменено" if ml["edited"] else "Оригинал",
+            "confidence": ml["confidence"],
+            "explanation": (
+                "Анализ основан на:\n"
+                "- шуме изображения\n"
+                "- статистике пикселей\n"
+                "- DCT структуре\n"
+                "- ML классификаторе"
+            ),
+            "heatmap": f"/image/{heat}"
+        }
+
+    except Exception as e:
+        return {
+            "result": "Ошибка анализа",
+            "error": str(e)
+        }
 
 # --------- Гистограмма ----------
 @app.post("/plot")
