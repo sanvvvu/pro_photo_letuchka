@@ -1,25 +1,8 @@
 from PIL import Image
 
-END_MARKER = "1111111111111110"
-
-
-def text_to_bits(text):
-    return ''.join(format(ord(c), '08b') for c in text) + END_MARKER
-
-
-def bits_to_text(bits):
-    chars = []
-    for i in range(0, len(bits), 8):
-        byte = bits[i:i+8]
-        if byte == END_MARKER[:8]:
-            break
-        chars.append(chr(int(byte, 2)))
-    return ''.join(chars)
-
-
 def embed_file(input_path, output_path, file_bytes):
-    img = Image.open(input_path).convert("RGB")
-    data = text_to_bits(file_bytes.decode(errors="ignore"))
+    img = Image.open(input_path)
+    data = ''.join(format(b, '08b') for b in file_bytes) + '1111111111111110'
 
     pixels = list(img.getdata())
     new_pixels = []
@@ -30,14 +13,11 @@ def embed_file(input_path, output_path, file_bytes):
         r, g, b = pixel
 
         if bit_idx < len(data):
-            r = (r & ~1) | int(data[bit_idx])
-            bit_idx += 1
+            r = (r & ~1) | int(data[bit_idx]); bit_idx += 1
         if bit_idx < len(data):
-            g = (g & ~1) | int(data[bit_idx])
-            bit_idx += 1
+            g = (g & ~1) | int(data[bit_idx]); bit_idx += 1
         if bit_idx < len(data):
-            b = (b & ~1) | int(data[bit_idx])
-            bit_idx += 1
+            b = (b & ~1) | int(data[bit_idx]); bit_idx += 1
 
         new_pixels.append((r, g, b))
 
@@ -47,11 +27,18 @@ def embed_file(input_path, output_path, file_bytes):
 
 def extract_file(path):
     img = Image.open(path)
+
     bits = ""
-
     for pixel in img.getdata():
-        for val in pixel:
-            bits += str(val & 1)
+        for v in pixel[:3]:
+            bits += str(v & 1)
 
-    text = bits_to_text(bits)
-    return text.encode()
+    bytes_out = []
+
+    for i in range(0, len(bits), 8):
+        byte = bits[i:i+8]
+        if byte == "11111111":
+            break
+        bytes_out.append(int(byte, 2))
+
+    return bytes(bytes_out).decode("utf-8", errors="ignore")
