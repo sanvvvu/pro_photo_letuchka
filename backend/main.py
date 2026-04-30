@@ -125,3 +125,8 @@ def analyze(filename: str = Form(...)):
 def plot(filename: str = Form(...)):
     file = histogram_plot(UPLOAD_DIR / filename)
     return {"plot": f"/image/{file}"}
+
+# --------- DOWNLOAD ----------
+@app.get("/download/{filename}")
+def download(filename: str):
+    return FileResponse(UPLOAD_DIR / filename, filename=filename)
