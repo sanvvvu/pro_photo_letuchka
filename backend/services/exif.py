@@ -1,29 +1,34 @@
-# backend/services/exif.py
 from PIL import Image
 import piexif
 
+
 def get_exif_data(path):
     img = Image.open(path)
+
     if "exif" not in img.info:
-        return {}
+        return {"message": "EXIF отсутствует"}
+
     exif = piexif.load(img.info["exif"])
 
-    readable = {}
+    result = {}
+
     for ifd in exif:
-        readable[ifd] = {}
+        result[ifd] = {}
         for tag, val in exif[ifd].items():
-            readable[ifd][str(tag)] = str(val)
-    return readable
+            result[ifd][str(tag)] = str(val)
+
+    return result
 
 
-def update_exif(path, new_exif, out):
+def update_exif(path, out, tag, value):
     img = Image.open(path)
 
-    exif_dict = {"0th": {}, "Exif": {}, "GPS": {}}
+    exif_dict = piexif.load(img.info.get("exif", b""))
 
-    for ifd in new_exif:
-        for tag, val in new_exif[ifd].items():
-            exif_dict[ifd][int(tag)] = val.encode()
+    try:
+        exif_dict["0th"][int(tag)] = str(value).encode()
+    except:
+        pass
 
     exif_bytes = piexif.dump(exif_dict)
     img.save(out, exif=exif_bytes)
