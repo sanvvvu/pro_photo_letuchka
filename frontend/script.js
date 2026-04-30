@@ -1,7 +1,16 @@
 let current = "";
 
+function safe(){
+    if(!current){
+        alert("Сначала загрузите изображение");
+        return false;
+    }
+    return true;
+}
+
 async function upload(){
-    let file = fileInput.files[0];
+    let file = document.getElementById("file").files[0];
+
     let fd = new FormData();
     fd.append("file", file);
 
@@ -9,10 +18,18 @@ async function upload(){
     let data = await res.json();
 
     current = data.filename;
-    preview.innerHTML = `<img src="/image/${current}">`;
+
+    document.getElementById("preview").innerHTML =
+        `<img src="/image/${current}?v=${Date.now()}">`;
+
+    document.getElementById("blurBtn").disabled = false;
+    document.getElementById("sharpBtn").disabled = false;
 }
 
+
 async function process(action){
+    if(!safe()) return;
+
     let fd = new FormData();
     fd.append("filename", current);
     fd.append("action", action);
@@ -21,15 +38,27 @@ async function process(action){
     let data = await res.json();
 
     current = data.file;
+
     document.getElementById("preview").innerHTML =
-        `<img src="/image/${current}">`;
+        `<img src="/image/${current}?v=${Date.now()}">`;
 }
 
-async function getExif(){
+
+async function loadExif(){
     let res = await fetch(`/exif?filename=${current}`);
     let data = await res.json();
-    document.getElementById("out").innerText = JSON.stringify(data,null,2);
+
+    let table = "<tr><th>IFD</th><th>TAG</th><th>VALUE</th></tr>";
+
+    for(let ifd in data){
+        for(let tag in data[ifd]){
+            table += `<tr><td>${ifd}</td><td>${tag}</td><td>${data[ifd][tag]}</td></tr>`;
+        }
+    }
+
+    document.getElementById("exifTable").innerHTML = table;
 }
+
 
 async function editExif(){
     let fd = new FormData();
@@ -37,15 +66,14 @@ async function editExif(){
     fd.append("tag", document.getElementById("tag").value);
     fd.append("value", document.getElementById("value").value);
 
-    let res = await fetch("/exif/edit",{method:"POST",body:fd});
-    let data = await res.json();
+    await fetch("/exif/edit",{method:"POST",body:fd});
 
-    current = data.file;
     alert("EXIF обновлён");
 }
 
+
 async function embed(){
-    let file = document.getElementById("secret").files[0];
+    let file = document.getElementById("secretFile").files[0];
 
     let fd = new FormData();
     fd.append("file", file);
@@ -54,9 +82,10 @@ async function embed(){
     let res = await fetch("/stego/embed",{method:"POST",body:fd});
     let data = await res.json();
 
-    current = data.file;
-    alert("Файл скрыт");
+    document.getElementById("stegoPreview").innerText =
+        "Скрыто: " + file.name;
 }
+
 
 async function extract(){
     let fd = new FormData();
@@ -67,6 +96,7 @@ async function extract(){
 
     alert("Извлечено: " + data.text);
 }
+
 
 async function compare(){
     let f1 = document.getElementById("file").files[0];
@@ -79,11 +109,9 @@ async function compare(){
     let res = await fetch("/compare",{method:"POST",body:fd});
     let data = await res.json();
 
-    alert(
-        "Разница: " + data.difference_score + "\n\n" +
-        data.interpretation
-    );
+    alert(`${data.difference_score}\n\n${data.interpretation}`);
 }
+
 
 async function analyze(){
     let fd = new FormData();
@@ -93,33 +121,12 @@ async function analyze(){
     let data = await res.json();
 
     document.getElementById("out").innerText =
-        `РЕЗУЛЬТАТ: ${data.result}\n` +
-        `УВЕРЕННОСТЬ: ${data.confidence}\n\n` +
-        data.explanation;
+        data.result + "\n" + data.explanation;
 
-    if(data.heatmap){
-        document.getElementById("heatmap").src = data.heatmap;
-    }
+    document.getElementById("heatmap").src = data.heatmap;
 }
+
 
 function reset(){
     location.reload();
-}
-
-function download(){
-    window.open(`/download/${current}`);
-}
-
-async function save(){
-    let format = document.getElementById("format").value;
-
-    let fd = new FormData();
-    fd.append("filename", current);
-    fd.append("format", format);
-
-    let res = await fetch("/save",{method:"POST",body:fd});
-    let data = await res.json();
-
-    current = data.file;
-    alert("Сохранено");
 }
