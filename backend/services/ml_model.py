@@ -20,6 +20,7 @@ def extract_features(path):
 
 
 def train_model(dataset_path="dataset"):
+    os.makedirs(dataset_path, exist_ok=True)
     X, y = [], []
 
     for file in os.listdir(dataset_path):
@@ -47,10 +48,17 @@ def load_model():
     return joblib.load(MODEL_PATH)
 
 
-model = load_model()
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        model = load_model()
+    return model
 
 
 def predict_image(path):
+    model = get_model()
     features = np.array(extract_features(path)).reshape(1, -1)
     pred = model.predict(features)[0]
 
