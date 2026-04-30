@@ -6,29 +6,26 @@ def get_exif_data(path):
     img = Image.open(path)
 
     if "exif" not in img.info:
-        return {"message": "EXIF отсутствует"}
+        return {}
 
     exif = piexif.load(img.info["exif"])
 
-    result = {}
-
+    readable = {}
     for ifd in exif:
-        result[ifd] = {}
+        readable[ifd] = {}
         for tag, val in exif[ifd].items():
-            result[ifd][str(tag)] = str(val)
+            readable[ifd][str(tag)] = str(val)
 
-    return result
+    return readable
 
 
-def update_exif(path, out, tag, value):
+def update_exif(path, tag, value, out_path):
     img = Image.open(path)
 
     exif_dict = piexif.load(img.info.get("exif", b""))
 
-    try:
-        exif_dict["0th"][int(tag)] = str(value).encode()
-    except:
-        pass
+    # всегда пишем в 0th (EXIF стандарт)
+    exif_dict["0th"][int(tag)] = value.encode("utf-8")
 
     exif_bytes = piexif.dump(exif_dict)
-    img.save(out, exif=exif_bytes)
+    img.save(out_path, exif=exif_bytes)
