@@ -20,16 +20,11 @@ async function upload(){
     current = data.filename;
 
     document.getElementById("preview").innerHTML =
-        `<img src="/image/${current}?v=${Date.now()}">`;
-
-    document.getElementById("blurBtn").disabled = false;
-    document.getElementById("sharpBtn").disabled = false;
+        `<img src="/image/${current}?t=${Date.now()}">`;
 }
 
 
 async function process(action){
-    if(!safe()) return;
-
     let fd = new FormData();
     fd.append("filename", current);
     fd.append("action", action);
@@ -40,7 +35,7 @@ async function process(action){
     current = data.file;
 
     document.getElementById("preview").innerHTML =
-        `<img src="/image/${current}?v=${Date.now()}">`;
+        `<img src="/image/${current}?t=${Date.now()}">`;
 }
 
 
@@ -109,7 +104,7 @@ async function compare(){
     let res = await fetch("/compare",{method:"POST",body:fd});
     let data = await res.json();
 
-    alert(`${data.difference_score}\n\n${data.interpretation}`);
+    alert("Разница: " + data.difference_score);
 }
 
 
