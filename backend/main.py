@@ -1,4 +1,3 @@
-# backend/main.py
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -40,7 +39,10 @@ async def upload(file: UploadFile = File(...)):
 
 @app.get("/image/{name}")
 def get_image(name: str):
-    return FileResponse(UPLOAD_DIR / name)
+    path = UPLOAD_DIR / name
+    if not path.exists():
+        return {"error": "not found"}
+    return FileResponse(path)
 
 
 # ---------- PROCESS ----------
@@ -53,11 +55,10 @@ def process(filename: str = Form(...), action: str = Form(...)):
     elif action == "sharpen":
         img = sharpen(img)
 
-    out_name = f"edit_{filename}"
-    out_path = UPLOAD_DIR / out_name
-    img.save(out_path)
+    out = UPLOAD_DIR / f"edit_{filename}"
+    img.save(out)
 
-    return {"file": out_name}
+    return {"file": f"edit_{filename}"}
 
 
 # ---------- EXIF ----------
@@ -68,29 +69,26 @@ def exif(filename: str):
 
 @app.post("/exif/edit")
 def exif_edit(filename: str = Form(...), tag: str = Form(...), value: str = Form(...)):
-    out_name = f"exif_{filename}"
-    out_path = UPLOAD_DIR / out_name
-
-    update_exif(UPLOAD_DIR / filename, {"0th": {tag: value}}, out_path)
-
-    return {"file": out_name}
+    out = UPLOAD_DIR / f"exif_{filename}"
+    update_exif(UPLOAD_DIR / filename, {"0th": {tag: value}}, out)
+    return {"file": f"exif_{filename}"}
 
 
 # ---------- STEGO ----------
 @app.post("/stego/embed")
-async def stego_embed(file: UploadFile = File(...), filename: str = Form(...)):
+async def embed(file: UploadFile = File(...), filename: str = Form(...)):
     data = await file.read()
 
-    out_name = f"stego_{filename}"
-    embed_file(UPLOAD_DIR / filename, UPLOAD_DIR / out_name, data)
+    out = UPLOAD_DIR / f"stego_{filename}"
+    embed_file(UPLOAD_DIR / filename, out, data)
 
-    return {"file": out_name}
+    return {"file": f"stego_{filename}"}
 
 
 @app.post("/stego/extract")
-def stego_extract(filename: str = Form(...)):
-    data = extract_file(UPLOAD_DIR / filename)
-    return {"text": data.decode(errors="ignore")}
+def extract(filename: str = Form(...)):
+    text = extract_file(UPLOAD_DIR / filename).decode(errors="ignore")
+    return {"text": text}
 
 
 # ---------- COMPARE ----------
@@ -112,41 +110,18 @@ async def compare(file1: UploadFile = File(...), file2: UploadFile = File(...)):
 def analyze(filename: str = Form(...)):
     path = UPLOAD_DIR / filename
 
-    try:
-        heat = generate_heatmap_image(path)
-        ml = predict_image(path)
+    heat = generate_heatmap_image(path)
+    ml = predict_image(path)
 
-        return {
-            "result": "Изменено" if ml["edited"] else "Оригинал",
-            "confidence": ml["confidence"],
-            "explanation": (
-                "Анализ основан на:\n"
-                "- шуме изображения\n"
-                "- статистике пикселей\n"
-                "- DCT структуре\n"
-                "- ML классификаторе"
-            ),
-            "heatmap": f"/image/{heat}"
-        }
+    return {
+        "result": "Изменено" if ml["edited"] else "Оригинал",
+        "confidence": ml["confidence"],
+        "explanation": "Анализ пикселей + шум + ML классификация",
+        "heatmap": f"/image/{heat}"
+    }
 
-    except Exception as e:
-        return {
-            "result": "Ошибка анализа",
-            "error": str(e)
-        }
 
-# --------- Гистограмма ----------
-@app.post("/plot")
-def plot(filename: str = Form(...)):
-    file = histogram_plot(UPLOAD_DIR / filename)
-    return {"plot": f"/image/{file}"}
-
-# --------- DOWNLOAD ----------
-@app.get("/download/{filename}")
-def download(filename: str):
-    return FileResponse(UPLOAD_DIR / filename, filename=filename)
-
-# --------- SAVE AS ----------
+# ---------- SAVE ----------
 @app.post("/save")
 def save(filename: str = Form(...), format: str = Form(...)):
     img = load_image(UPLOAD_DIR / filename)
