@@ -99,3 +99,7 @@ async function analyze(){
 function reset(){
     location.reload();
 }
+
+function download(){
+    window.open(`/download/${current}`);
+}
