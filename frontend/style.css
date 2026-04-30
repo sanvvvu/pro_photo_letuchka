@@ -1,37 +1,5 @@
 body {
-    background: linear-gradient(#a8e063, #56ab2f);
-    font-family: Arial;
-    text-align: center;
-}
-
-.container {
-    width: 800px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-button {
-    background: #ffcc00;
-    border: none;
-    padding: 10px;
-    margin: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #ffaa00;
-}
-
-img {
-    max-width: 100%;
-    margin-top: 10px;
-}
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-body {
-    background: linear-gradient(#5c94fc 70%, #c2b280 70%);
+    background: linear-gradient(#b30000, #ffcc00);
     font-family: 'Press Start 2P', cursive;
     text-align: center;
 }
@@ -40,34 +8,44 @@ body {
     width: 900px;
     margin: auto;
     background: #fff8dc;
-    border: 6px solid #000;
-    box-shadow: 8px 8px #000;
+    border: 6px solid black;
+    box-shadow: 10px 10px black;
     padding: 20px;
 }
 
-button {
-    background: #ff0000;
-    color: white;
-    border: 4px solid #000;
-    padding: 10px;
+.mario-btn {
+    background: url("https://i.imgur.com/3XQZQ5L.png");
+    background-size: 100% 100%;
+    border: 4px solid black;
+    padding: 15px;
+    margin: 5px;
     cursor: pointer;
-    box-shadow: 5px 5px #000;
-    transition: all 0.1s;
+    transition: transform 0.1s;
 }
 
-button:active {
+.mario-btn:active {
     transform: translate(4px,4px);
-    box-shadow: 1px 1px #000;
 }
 
-/* “кирпичики” */
-.container::before {
-    content: "";
-    display: block;
-    height: 20px;
-    background: repeating-linear-gradient(
-        90deg,
-        #b5651d 0 20px,
-        #8b4513 20px 40px
-    );
+img {
+    max-width: 100%;
+}
+
+.dropzone {
+    border: 4px dashed black;
+    padding: 20px;
+    margin: 10px;
+}
+
+/* EXIF TABLE */
+table {
+    width: 100%;
+    border: 2px solid black;
+    margin-top: 10px;
+}
+
+td, th {
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 10px;
 }
