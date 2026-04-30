@@ -12,6 +12,7 @@ from services.forensics import analyze_forensics
 from services.ml_model import predict_image
 from services.dct_analysis import analyze_dct
 from services.heatmap import generate_heatmap_image
+from services.plot import histogram_plot
 
 app = FastAPI()
 
@@ -118,3 +119,9 @@ def analyze(filename: str = Form(...)):
         "explanation": "Анализ выполнен по статистике пикселей, шуму и структуре JPEG",
         "heatmap": f"/image/{heat}"
     }
+
+# --------- Гистограмма ----------
+@app.post("/plot")
+def plot(filename: str = Form(...)):
+    file = histogram_plot(UPLOAD_DIR / filename)
+    return {"plot": f"/image/{file}"}
