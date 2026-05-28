@@ -100,3 +100,13 @@ async function loadExif(){
 
     document.getElementById("exifTable").innerHTML = html;
 }
+function showHelp(type){
+    const help = {
+        exif: "EXIF — это метаданные фото: камера, дата, GPS, автор.",
+        stego: "Стеганография скрывает текст/файлы внутри изображения.",
+        analyze: "Анализ проверяет, редактировалось ли изображение с помощью ML.",
+        compare: "Сравнение показывает разницу между двумя изображениями."
+    };
+
+    alert(help[type]);
+}
