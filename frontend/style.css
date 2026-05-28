@@ -49,3 +49,15 @@ td, th {
     padding: 5px;
     font-size: 10px;
 }
+
+button {
+    background-image: url("/static/sprites/buttons.png");
+    background-size: 300px;
+    image-rendering: pixelated;
+    border: 3px solid black;
+    transition: transform 0.1s;
+}
+
+button:active {
+    transform: scale(0.9) translateY(2px);
+}
