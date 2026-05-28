@@ -75,3 +75,28 @@ async function resetImage(){
         `<img class="main-image"
         src="/image/${current}?v=${Date.now()}">`;
 }
+
+async function loadExif(){
+    let res = await fetch(`/exif?filename=${current}`);
+    let data = await res.json();
+
+    let html = `
+    <tr>
+        <th>Группа</th>
+        <th>Тег</th>
+        <th>Значение</th>
+    </tr>`;
+
+    for(let group in data){
+        for(let tag in data[group]){
+            html += `
+            <tr>
+                <td>${group}</td>
+                <td>${tag}</td>
+                <td>${data[group][tag]}</td>
+            </tr>`;
+        }
+    }
+
+    document.getElementById("exifTable").innerHTML = html;
+}
