@@ -1,85 +1,201 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
 <meta charset="UTF-8">
+
 <title>Mario Forensics Lab</title>
 
 <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>🍄 Mario Image Forensics</h1>
+    <h1>🍄 Mario Image Forensics</h1>
 
-<div class="dropzone">📦 Drag & Drop</div>
+    <!-- ================= UPLOAD ================= -->
 
-<input type="file" id="file">
-<button class="mario-btn" onclick="upload()">ЗАГРУЗИТЬ</button>
+    <div class="dropzone">
+        📦 Перетащите изображение сюда
+    </div>
 
-<div id="preview"></div>
+    <input type="file" id="file">
 
-<h2>🎮 РЕДАКТОР</h2>
-<button id="blurBtn" class="mario-btn" onclick="process('blur')">BLUR</button>
-<button id="sharpBtn" class="mario-btn" onclick="process('sharpen')">SHARP</button>
-<button class="mario-btn" onclick="reset()">RESET</button>
+    <button
+    class="mario-btn"
+    onclick="upload()">
+        ЗАГРУЗИТЬ
+    </button>
 
-<h2>📊 EXIF EDITOR</h2>
+    <div id="preview"></div>
 
-<button onclick="loadExif()">ПОКАЗАТЬ EXIF</button>
+    <!-- ================= EDITOR ================= -->
 
-<table id="exifTable"></table>
+    <h2>🎮 РЕДАКТОР</h2>
 
-<input id="tag" placeholder="TAG">
-<input id="value" placeholder="VALUE">
-<button onclick="editExif()">ИЗМЕНИТЬ</button>
+    <button
+    id="blurBtn"
+    class="mario-btn"
+    onclick="process('blur')">
+        РАЗМЫТИЕ
+    </button>
 
-<h2>👁 STEGO</h2>
+    <button
+    id="sharpBtn"
+    class="mario-btn"
+    onclick="process('sharpen')">
+        РЕЗКОСТЬ
+    </button>
 
-<input type="file" id="secretFile">
-<button onclick="embed()">СКРЫТЬ</button>
-<button onclick="extract()">ИЗВЛЕЧЬ</button>
+    <button
+    class="mario-btn"
+    onclick="resetImage()">
+        СБРОС
+    </button>
 
-<div id="stegoPreview"></div>
+    <!-- ================= EXIF ================= -->
 
-<h2>⚖ СРАВНЕНИЕ</h2>
+    <h2>
+        📊 EXIF МЕТАДАННЫЕ
 
-<input type="file" id="file2">
-<button onclick="compare()">COMPARE</button>
+        <button
+        class="help-btn"
+        onclick="showHelp('exif')">
+            ❓
+        </button>
+    </h2>
 
-<h2>🧠 АНАЛИЗ</h2>
+    <button
+    class="mario-btn"
+    onclick="loadExif()">
+        ПОКАЗАТЬ EXIF
+    </button>
 
-<button onclick="analyze()">RUN</button>
+    <table id="exifTable">
 
-<pre id="out"></pre>
-<img id="heatmap">
+        <tr>
+            <th>Категория</th>
+            <th>Тег</th>
+            <th>Значение</th>
+        </tr>
+
+    </table>
+
+    <div class="editor-box">
+
+        <select id="ifd">
+
+            <option value="0th">
+                Основные
+            </option>
+
+            <option value="Exif">
+                EXIF
+            </option>
+
+            <option value="GPS">
+                GPS
+            </option>
+
+        </select>
+
+        <input
+        id="tag"
+        placeholder="Например: Artist">
+
+        <input
+        id="value"
+        placeholder="Новое значение">
+
+        <button
+        class="mario-btn"
+        onclick="editExif()">
+            ИЗМЕНИТЬ EXIF
+        </button>
+
+    </div>
+
+    <!-- ================= COMPARE ================= -->
+
+    <h2>
+        ⚖ СРАВНЕНИЕ
+
+        <button
+        class="help-btn"
+        onclick="showHelp('compare')">
+            ❓
+        </button>
+    </h2>
+
+    <input type="file" id="file2">
+
+    <button
+    class="mario-btn"
+    onclick="compareImages()">
+        СРАВНИТЬ
+    </button>
+
+    <!-- ================= ANALYZE ================= -->
+
+    <h2>
+        🧠 ML АНАЛИЗ
+
+        <button
+        class="help-btn"
+        onclick="showHelp('analyze')">
+            ❓
+        </button>
+    </h2>
+
+    <button
+    class="mario-btn"
+    onclick="analyzeImage()">
+        ЗАПУСТИТЬ АНАЛИЗ
+    </button>
+
+    <pre id="out"></pre>
+
+    <img id="heatmap">
+
+    <!-- ================= ELA ================= -->
+
+    <h2>🍄 ELA АНАЛИЗ</h2>
+
+    <button
+    class="mario-btn"
+    onclick="runELA()">
+        ЗАПУСТИТЬ ELA
+    </button>
+
+    <!-- ================= CMFD ================= -->
+
+    <h2>🔍 ПОИСК КЛОНИРОВАНИЯ</h2>
+
+    <button
+    class="mario-btn"
+    onclick="runCMFD()">
+        ЗАПУСТИТЬ CMFD
+    </button>
+
+    <!-- ================= CFA ================= -->
+
+    <h2>📷 CFA АНАЛИЗ</h2>
+
+    <button
+    class="mario-btn"
+    onclick="runCFA()">
+        ЗАПУСТИТЬ CFA
+    </button>
+
+    <img id="analysisImage">
 
 </div>
 
-<h2>ELA Анализ</h2>
-<button class="mario-btn" onclick="runELA()">
-🍄 Запустить ELA
-</button>
-
-<h2>CMFD Детекция</h2>
-<button class="mario-btn" onclick="runCMFD()">
-🔍 Поиск клонирования
-</button>
-
-<h2>CFA Анализ</h2>
-<button class="mario-btn" onclick="runCFA()">
-📷 CFA Анализ
-</button>
-
-<h2>EXIF Метаданные <button onclick="showHelp('exif')">❓</button></h2>
-
-<table id="exifTable"></table>
-
-<h2>Анализ <button onclick="showHelp('analyze')">❓</button></h2>
-
-<h2>Сравнение <button onclick="showHelp('compare')">❓</button></h2>
-
 <script src="/static/script.js"></script>
+
 </body>
 </html>
