@@ -118,3 +118,8 @@ ELA позволяет:
 - JavaScript
 
 ---
+<img width="854" height="916" alt="image" src="https://github.com/user-attachments/assets/2eb683de-4f0e-4932-bc91-6a2d6ec96cf4" />
+<img width="827" height="610" alt="image" src="https://github.com/user-attachments/assets/0e4b755e-3a40-4d3c-ac57-f0492582bcf3" />
+<img width="827" height="796" alt="image" src="https://github.com/user-attachments/assets/17e14f2b-66df-4195-a0eb-8948df6b5d06" />
+
+
